@@ -1,6 +1,7 @@
 import React from 'react'
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, ShoppingCartIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Link } from 'react-router-dom';
 
 const user = {
   name: 'Tom Cook',
@@ -10,10 +11,7 @@ const user = {
 }
 const navigation = [
   { name: 'Dashboard', href: '#', current: true },
-  { name: 'Team', href: '#', current: false },
-  { name: 'Projects', href: '#', current: false },
-  { name: 'Calendar', href: '#', current: false },
-  { name: 'Reports', href: '#', current: false },
+ 
 ]
 const userNavigation = [
   { name: 'Your Profile', href: '#' },
@@ -25,7 +23,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-const Navbar = ({ children } ) => {
+const DashboardNavbar = ({ children } ) => {
     return (
         <>
           <div className="min-h-full">
@@ -34,11 +32,13 @@ const Navbar = ({ children } ) => {
                 <div className="flex h-16 items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
+                      <Link to='/'>
                       <img
                         alt="Your Company"
                         src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
                         className="h-8 w-8"
                       />
+                      </Link>
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
@@ -64,12 +64,16 @@ const Navbar = ({ children } ) => {
                         type="button"
                         className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                       >
-                        <div className="flex gap-1 items-center">
+                       
+                          <Link to="/cart">
+                          <div className="flex gap-1 items-center">
                         < ShoppingCartIcon aria-hidden="true" className="h-6 w-6" />
                         <span className="inline-flex items-center rounded-md bg-red-50 px-1 mb-4 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">    
-                                              2
+                        2
                         </span>
                         </div>
+                        </Link>
+                       
                         
                       </button>
     
@@ -144,10 +148,12 @@ const Navbar = ({ children } ) => {
                     >
                       
                       <div className="flex gap-1 items-center">
+                        <Link to='/cart'>
                         < ShoppingCartIcon aria-hidden="true" className="h-6 w-6" />
                         <span className="inline-flex items-center rounded-md bg-red-50 px-1 mb-4 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">    
-                                              2
+                        2
                         </span>
+                        </Link>
                         </div>
                     </button>
                   </div>
@@ -183,4 +189,4 @@ const Navbar = ({ children } ) => {
       )
 }
 
-export default Navbar
+export default DashboardNavbar
