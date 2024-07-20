@@ -19,7 +19,7 @@ export function fetchProductsByFilters(filter,sort) {
   }
 
   for(let key in sort){
-    queryString += `${key}=${sort[key]}`
+    queryString += `${key}=${sort[key]}&`
     }
 
 
