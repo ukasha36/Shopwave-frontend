@@ -7,7 +7,7 @@ export function fetchAllProducts() {
   });
 }
 
-export function fetchProductsByFilters(filter,sort) {
+export function fetchProductsByFilters(filter,sort,pagination) {
   let queryString = "";
 
   for(let key in filter){
@@ -23,12 +23,22 @@ export function fetchProductsByFilters(filter,sort) {
     }
 
 
+    console.log( pagination)
+    for (let key in pagination) {
+      queryString += `${key}=${pagination[key]}&`;
+    }
+  
+
+
   return new Promise(async (resolve) => {
     try {
       const response = await fetch('http://localhost:8000/products?'+queryString);
       const data = await response.json();
       console.log("API Response Data:", data);
-      resolve({ data });
+      const totalItems = data.items;
+      resolve({ data : {
+        products:data,totalItems:+totalItems  
+      } });
     } catch (error) {
       console.error("Error fetching products:", error);
       resolve({ data: [] });

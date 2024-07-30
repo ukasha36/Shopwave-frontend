@@ -4,6 +4,7 @@ import {
   selectAllProducts,
   fetchAllProductsAsync,
   fetchProductsByFiltersAsync,
+  selectTotalItems,
 } from "../ProductSlice";
 import {
   ChevronLeftIcon,
@@ -32,6 +33,7 @@ import {
   PlusIcon,
   Squares2X2Icon,
 } from "@heroicons/react/20/solid";
+import { ITEMS_PER_PAGE } from "../../../app/Contants";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -41,9 +43,8 @@ const sortOptions = [
   { name: "Best Rating", sort: "-rating", current: false },
   { name: "Price: Low to High", sort: "price", current: false },
   { name: "Price: High to Low", sort: "-price", current: false },
-  ]
+];
 
- 
 const filters = [
   {
     id: "category",
@@ -116,37 +117,52 @@ const ProductList = () => {
   const dispatch = useDispatch();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const products = useSelector(selectAllProducts);
+  const totalItems = useSelector(selectTotalItems);
   const [filter, setFilter] = useState({});
   const [sort, setSort] = useState({});
+  const [page, setPage] = useState(1);
+  // const  = 55 ;
 
   const handleFilter = (e, section, option) => {
-     console.log(e.target.checked)
+    console.log(e.target.checked);
     const newFilter = { ...filter };
-     if(e.target.checked){
-      if(newFilter[section.id]){
-        newFilter[section.id].push(option.value)
-      } else{
-        newFilter[section.id] = [option.value]
+    if (e.target.checked) {
+      if (newFilter[section.id]) {
+        newFilter[section.id].push(option.value);
+      } else {
+        newFilter[section.id] = [option.value];
       }
-    } else{
-       const index = newFilter[section.id].findIndex(el=>el===option.value)
-       newFilter[section.id].splice(index,1);
+    } else {
+      const index = newFilter[section.id].findIndex(
+        (el) => el === option.value
+      );
+      newFilter[section.id].splice(index, 1);
     }
-    console.log({newFilter});
+    console.log({ newFilter });
 
     setFilter(newFilter);
-     console.log(section.id, option.value);
-
+    console.log(section.id, option.value);
   };
   const handleSort = (e, option) => {
     const sort = { _sort: option.sort, _order: option.order };
-    console.log({sort});
+    console.log({ sort });
     setSort(sort);
-     };
+  };
+
+  const handlePage = (page) => {
+    console.log({ page });
+    setPage(page);
+  };
 
   useEffect(() => {
-    dispatch(fetchProductsByFiltersAsync({ filter, sort }));
-  }, [dispatch, filter, sort]);
+    const pagination = { _page: page, _per_page: ITEMS_PER_PAGE };
+    dispatch(fetchProductsByFiltersAsync({ filter, sort, pagination }));
+  }, [dispatch, filter, sort, page]);
+
+  useEffect(()=>{
+    setPage(1)
+  },[totalItems,sort])
+
 
   return (
     <div className="bg-white">
@@ -377,7 +393,7 @@ const ProductList = () => {
                     <div className="bg-white">
                       <div className="mx-auto max-w-2xl px-4 py-0 sm:px-6 sm:py-0 lg:max-w-7xl lg:px-8">
                         <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-                          {products.map((product) => (
+                          {products.data?.map((product) => (
                             <Link to="/productdetails">
                               <div
                                 key={product.id}
@@ -452,9 +468,18 @@ const ProductList = () => {
                 <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700">
-                      Showing <span className="font-medium">1</span> to{" "}
-                      <span className="font-medium">10</span> of{" "}
-                      <span className="font-medium">97</span> results
+                      Showing
+                      <span className="font-medium">
+                       {(page - 1) * ITEMS_PER_PAGE + 1}
+                      </span>
+                      to
+                      <span className="font-medium">
+                        {page * ITEMS_PER_PAGE > totalItems
+                          ? totalItems
+                          : page * ITEMS_PER_PAGE > totalItems}
+                      </span>
+                      of <span className="font-medium">{totalItems}</span>
+                      results
                     </p>
                   </div>
                   <div>
@@ -472,20 +497,22 @@ const ProductList = () => {
                           className="h-5 w-5"
                         />
                       </a>
-                      {/* Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0" */}
-                      <a
-                        href="#"
-                        aria-current="page"
-                        className="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      >
-                        1
-                      </a>
-                      <a
-                        href="#"
-                        className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                      >
-                        2
-                      </a>
+
+                      {Array.from({
+                        length: Math.ceil(totalItems / ITEMS_PER_PAGE),
+                      }).map((el, index) => (
+                        <a
+                          onClick={(e) => handlePage(index + 1)}
+                          aria-current="page"
+                          className={`relative cursor-pointer z-10 inline-flex items-center ${
+                            index + 1 === page
+                              ? "bg-indigo-600 text-white"
+                              : "text-gray-400"
+                          } px-4 py-2 text-sm font-semibold  focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+                        >
+                          {index + 1}
+                        </a>
+                      ))}
 
                       <a
                         href="#"
@@ -510,5 +537,3 @@ const ProductList = () => {
 };
 
 export default ProductList;
-
- 
