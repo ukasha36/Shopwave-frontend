@@ -12,6 +12,7 @@ import Cart from "./features/cart/Cart.js";
 import CartPage from "./pages/CartPage.js";
 import Checkout from "./pages/Checkout.js";
 import ProductDetails from './features/productList/components/ProductDetails.js';
+import Protected from '../src/features/productList/components/Protected.js'; // Import the Protected component
 
 import MainLayout from './Layout/MainLayout';
 import SimpleLayout from './Layout/SimpleLayout';
@@ -22,16 +23,24 @@ import "./App.css";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />
+    element: <Protected><Home /></Protected> 
   },
   {
     path: "/",
     element: <MainLayout />,
     children: [
-      { path: "/productdetails", element: <ProductDetails /> },
-      { path: "/cart", element: <CartPage /> },
-      { path: "/checkout", element: <Checkout /> },
-    ],
+      { 
+        path: "/productdetails/:id", 
+        element: <Protected><ProductDetails /></Protected> 
+      },
+      { 
+        path: "/cart", 
+        element: <Protected><CartPage /></Protected> 
+      },
+      { 
+        path: "/checkout", 
+        element: <Protected><Checkout /></Protected> 
+      },    ],
   },
   {
     path: "/",
